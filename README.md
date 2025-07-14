@@ -1,4 +1,4 @@
-Jump host EC2 Creation
+# Jump host EC2 Creation
 curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin
@@ -26,4 +26,24 @@ Following command for cluster creation:eksctl create cluster \
   --managed
 Add Required Secrets in github repo
 Create deployment and service.yaml files
+
+# Add Monitoring tools:**
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm version
+kubectl create namespace monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring
+# Open port 9090 in security group
+
+# verify Dashboard using grafana 
+# Expose Grafana
+kubectl patch svc prometheus-stack-grafana -n monitoring -p '{"spec": {"type": "LoadBalancer"}}'
+
+# Expose Prometheus
+kubectl patch svc prometheus-stack-kube-prometheus-sta-prometheus -n monitoring -p '{"spec": {"type": "LoadBalancer"}}'
+
+
+
 
