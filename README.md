@@ -24,3 +24,6 @@ Following command for cluster creation:eksctl create cluster \
   --nodes-min 1 \
   --nodes-max 3 \
   --managed
+Add Required Secrets in github repo
+Create deployment and service.yaml files
+
