@@ -27,6 +27,16 @@ Following command for cluster creation:eksctl create cluster \
 Add Required Secrets in github repo
 Create deployment and service.yaml files
 
+Add Authentiacte user to EKS AS BELOW
+
+eksctl create iamidentitymapping \
+  --cluster devops-eks-demo \
+  --region ap-south-1 \
+  --arn arn:aws:iam::<ACCOUNT_ID>:user/admin2 \
+  --username admin2 \
+  --group system:masters
+
+
 # Add Monitoring tools:**
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 helm version
