@@ -33,7 +33,7 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/eks-flask-app:latest
 
-    # --- AWS & EKS Access ---
+    # --- AWS Authentication ---
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -48,20 +48,21 @@ jobs:
       with:
         version: latest
 
-    # --- Load kubeconfig from GitHub Secret ---
-    - name: Load kubeconfig
+    # --- Generate kubeconfig using AWS CLI (correct way) ---
+    - name: Generate kubeconfig
       run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBE_CONFIG}}" > ~/.kube/config
-        chmod 600 ~/.kube/config
+        aws eks update-kubeconfig \
+          --name $CLUSTER_NAME \
+          --region $AWS_REGION
+        echo "Kubeconfig updated"
 
     - name: Test EKS Access
       run: kubectl get nodes
 
     - name: Deploy to EKS
       run: |
-        kubectl apply -f deployment.yaml --validate=false
-        kubectl apply -f service.yaml --validate=false
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
 
     - name: Verify Deployment
       run: |
