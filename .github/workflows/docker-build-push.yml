@@ -48,9 +48,15 @@ jobs:
       with:
         version: latest
 
-    - name: Update kubeconfig
+    # --- Load kubeconfig from GitHub Secret ---
+    - name: Load kubeconfig
       run: |
-        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG}}" > ~/.kube/config
+        chmod 600 ~/.kube/config
+
+    - name: Test EKS Access
+      run: kubectl get nodes
 
     - name: Deploy to EKS
       run: |
