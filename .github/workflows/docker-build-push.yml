@@ -33,21 +33,12 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/eks-flask-app:latest
 
-    # --- Assume EKS GitHub Actions IAM Role ---
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: arn:aws:iam::860366539080:role/github-actions-role
-        aws-region: ${{ env.AWS_REGION }}
-
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: latest
-
-    - name: Update kubeconfig
+    # --- Load kubeconfig from GitHub Secret ---
+    - name: Load kubeconfig
       run: |
-        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+        chmod 600 ~/.kube/config
 
     - name: Test EKS Access
       run: kubectl get nodes
@@ -61,5 +52,6 @@ jobs:
       run: |
         kubectl rollout status deployment/eks-flask-app
         kubectl get svc eks-flask-service
+
 
         
